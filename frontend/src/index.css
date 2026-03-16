@@ -1,0 +1,46 @@
+/* src/index.css */
+:root {
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #1e293b;
+  --text-light: #64748b;
+  --danger: #ef4444;
+  --success: #22c55e;
+  --border: #e2e8f0;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+
+.container { max-width: 900px; margin: 40px auto; padding: 20px; }
+.card { background: var(--card); padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid var(--border); }
+
+h1, h2, h3 { color: var(--text); margin-bottom: 16px; font-weight: 700; }
+
+form { display: grid; gap: 16px; }
+input, select { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; outline: none; transition: border 0.2s; }
+input:focus { border-color: var(--primary); }
+
+button { padding: 12px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 15px; transition: 0.2s; }
+button:hover { background: var(--primary-hover); transform: translateY(-1px); }
+button.danger { background: var(--danger); }
+button.secondary { background: #f1f5f9; color: var(--text); border: 1px solid var(--border); }
+
+nav { background: white; padding: 16px 40px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+.nav-brand { font-size: 22px; font-weight: 800; color: var(--primary); text-decoration: none; }
+.nav-links { display: flex; gap: 24px; }
+.nav-links a { text-decoration: none; color: var(--text-light); font-weight: 500; }
+.nav-links a:hover, .nav-links a.active { color: var(--primary); }
+
+table { width: 100%; border-collapse: collapse; margin-top: 24px; }
+th { text-align: left; padding: 12px; border-bottom: 2px solid var(--border); color: var(--text-light); font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+td { padding: 16px 12px; border-bottom: 1px solid var(--border); }
+
+.home-hero { text-align: center; margin-top: 80px; }
+.home-hero h1 { font-size: 48px; margin-bottom: 16px; }
+.home-hero p { font-size: 18px; color: var(--text-light); margin-bottom: 32px; }
+
+.error { color: var(--danger); font-size: 14px; margin-top: 8px; }
+.chart-container { background: white; padding: 20px; border-radius: 12px; margin-bottom: 32px; border: 1px solid var(--border); }
