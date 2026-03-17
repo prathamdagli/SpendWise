@@ -1,5 +1,7 @@
 // src/components/Navbar.jsx
-import { Link, useNavigate } from "react-router-dom";
+// Top navigation with links: Dashboard | Add Expense | Analytics (when logged in)
+
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { auth } from "../firebase";
 import { signOut, onAuthStateChanged } from "firebase/auth";
 import { useState, useEffect } from "react";
@@ -7,6 +9,7 @@ import { useState, useEffect } from "react";
 function Navbar() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => setUser(currentUser));
@@ -18,21 +21,27 @@ function Navbar() {
     navigate("/");
   };
 
+  // Helper to add "active" class to the current route link
+  const isActive = (path) => location.pathname === path ? "active" : "";
+
   return (
     <nav>
-      <Link to="/" className="nav-brand">SpendWise</Link>
+      <Link to="/" className="nav-brand">💰 SpendWise</Link>
       <div className="nav-links">
-        <Link to="/">Home</Link>
         {user ? (
           <>
-            <Link to="/add">Add Expense</Link>
-            <Link to="/dashboard">Analytics</Link>
-            <button onClick={handleLogout} className="danger" style={{padding: '8px 16px'}}>Logout</button>
+            <Link to="/dashboard" className={isActive("/dashboard")}>Dashboard</Link>
+            <Link to="/add" className={isActive("/add")}>Add Expense</Link>
+            <Link to="/analytics" className={isActive("/analytics")}>Analytics</Link>
+            <span className="nav-user">👤 {user.email?.split("@")[0]}</span>
+            <button onClick={handleLogout} className="danger" style={{ padding: "8px 18px", fontSize: "13px" }}>
+              Logout
+            </button>
           </>
         ) : (
           <>
-            <Link to="/login">Login</Link>
-            <Link to="/register">Register</Link>
+            <Link to="/login" className={isActive("/login")}>Login</Link>
+            <Link to="/register" className={isActive("/register")}>Register</Link>
           </>
         )}
       </div>

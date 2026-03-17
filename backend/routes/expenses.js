@@ -1,24 +1,29 @@
 // routes/expenses.js
-// This file handles all expense-related API routes.
-// Each route reads/writes data from Firestore.
+// Handles all expense CRUD routes.
+// Now also supports recurring expense fields.
 
 const express = require("express");
 const router = express.Router();
 const { db } = require("../firebaseAdmin");
 
-// POST /expenses
-// Adds a new expense to Firestore
+// POST /expenses — Add a new expense
 router.post("/", async (req, res) => {
   try {
-    const { userId, title, category, amount, date } = req.body;
+    const {
+      userId, title, category, amount, date,
+      isRecurring, recurrenceType, recurrenceDate,
+    } = req.body;
 
-    // Create a new document in the "expenses" collection
     const docRef = await db.collection("expenses").add({
       userId,
       title,
       category,
       amount: parseFloat(amount),
       date,
+      // Recurring fields (default to false if not provided)
+      isRecurring: isRecurring || false,
+      recurrenceType: isRecurring ? recurrenceType : null,
+      recurrenceDate: isRecurring ? parseInt(recurrenceDate) : null,
       createdAt: new Date().toISOString(),
     });
 
@@ -29,13 +34,11 @@ router.post("/", async (req, res) => {
   }
 });
 
-// GET /expenses?userId=xxx
-// Gets all expenses for a specific user
+// GET /expenses?userId=xxx — Get all expenses for a user
 router.get("/", async (req, res) => {
   try {
     const { userId } = req.query;
 
-    // Query Firestore for documents where userId matches
     const snapshot = await db
       .collection("expenses")
       .where("userId", "==", userId)
@@ -53,19 +56,23 @@ router.get("/", async (req, res) => {
   }
 });
 
-// PUT /expenses/:id
-// Updates an existing expense by its Firestore document ID
+// PUT /expenses/:id — Update an expense
 router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, category, amount, date } = req.body;
+    const {
+      title, category, amount, date,
+      isRecurring, recurrenceType, recurrenceDate,
+    } = req.body;
 
-    // Update only the provided fields in the document
     await db.collection("expenses").doc(id).update({
       title,
       category,
       amount: parseFloat(amount),
       date,
+      isRecurring: isRecurring || false,
+      recurrenceType: isRecurring ? recurrenceType : null,
+      recurrenceDate: isRecurring ? parseInt(recurrenceDate) : null,
     });
 
     res.status(200).json({ message: "Expense updated" });
@@ -75,14 +82,11 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// DELETE /expenses/:id
-// Deletes an expense by its Firestore document ID
+// DELETE /expenses/:id — Delete an expense
 router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-
     await db.collection("expenses").doc(id).delete();
-
     res.status(200).json({ message: "Expense deleted" });
   } catch (error) {
     console.error("Error deleting expense:", error);
