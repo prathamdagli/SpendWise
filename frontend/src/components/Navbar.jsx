@@ -26,14 +26,14 @@ function Navbar() {
 
   return (
     <nav>
-      <Link to="/" className="nav-brand">💰 SpendWise</Link>
+      <Link to="/" className="nav-brand">SpendWise</Link>
       <div className="nav-links">
         {user ? (
           <>
             <Link to="/dashboard" className={isActive("/dashboard")}>Dashboard</Link>
             <Link to="/add" className={isActive("/add")}>Add Expense</Link>
             <Link to="/analytics" className={isActive("/analytics")}>Analytics</Link>
-            <span className="nav-user">👤 {user.email?.split("@")[0]}</span>
+            <span className="nav-user">{user.email?.split("@")[0]}</span>
             <button onClick={handleLogout} className="danger" style={{ padding: "8px 18px", fontSize: "13px" }}>
               Logout
             </button>

@@ -67,7 +67,7 @@ function EditExpense({ expense, onDone }) {
           checked={isRecurring}
           onChange={(e) => setIsRecurring(e.target.checked)}
         />
-        <label htmlFor="edit-recurring-check">🔁 Recurring Expense</label>
+        <label htmlFor="edit-recurring-check">Recurring Expense</label>
       </div>
 
       {isRecurring && (
@@ -92,7 +92,7 @@ function EditExpense({ expense, onDone }) {
       )}
 
       <div style={{ display: "flex", gap: "10px", marginTop: "4px" }}>
-        <button type="submit" style={{ flex: 1 }}>✓ Update</button>
+        <button type="submit" style={{ flex: 1 }}>Update</button>
         <button type="button" className="secondary" onClick={onDone} style={{ flex: 1 }}>Cancel</button>
       </div>
     </form>

@@ -103,7 +103,7 @@ body {
   align-items: center;
   gap: 10px;
 }
-.reminder-item::before { content: '🔔'; font-size: 16px; }
+.reminder-item::before { content: ''; font-size: 16px; }
 
 /* ── Inline Add Expense Form ── */
 .add-expense-toggle {

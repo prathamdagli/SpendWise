@@ -96,7 +96,7 @@ function AddExpense({ userId, onExpenseAdded }) {
             checked={isRecurring}
             onChange={(e) => setIsRecurring(e.target.checked)}
           />
-          <label htmlFor="recurring-check">🔁 Recurring Expense</label>
+          <label htmlFor="recurring-check">Recurring Expense</label>
         </div>
 
         {/* Extra fields shown only when recurring is checked */}
@@ -126,7 +126,7 @@ function AddExpense({ userId, onExpenseAdded }) {
         {error && <p className="error">{error}</p>}
 
         <button type="submit" disabled={loading}>
-          {loading ? "Saving..." : "💾 Save Expense"}
+          {loading ? "Saving..." : "Save Expense"}
         </button>
       </form>
     </div>

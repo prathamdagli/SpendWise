@@ -31,7 +31,7 @@ function ExpenseList({ expenses, onExpenseChanged }) {
   if (expenses.length === 0) {
     return (
       <div className="card empty-state">
-        <p>📭 No expenses yet.</p>
+        <p>No expenses yet.</p>
         <p style={{ marginTop: "8px", fontSize: "13px" }}>Use the form above to add your first expense!</p>
       </div>
     );
@@ -56,7 +56,7 @@ function ExpenseList({ expenses, onExpenseChanged }) {
                 <td>
                   {expense.title}
                   {expense.isRecurring && (
-                    <span className="recurring-tag">🔁 {expense.recurrenceType}</span>
+                    <span className="recurring-tag">{expense.recurrenceType}</span>
                   )}
                 </td>
                 <td>
@@ -70,14 +70,14 @@ function ExpenseList({ expenses, onExpenseChanged }) {
                     onClick={() => setEditingId(expense.id)}
                     style={{ marginRight: "8px", padding: "6px 14px", fontSize: "13px" }}
                   >
-                    ✏️ Edit
+                    Edit
                   </button>
                   <button
                     className="danger"
                     onClick={() => handleDelete(expense.id)}
                     style={{ padding: "6px 14px", fontSize: "13px" }}
                   >
-                    🗑️ Delete
+                    Delete
                   </button>
                 </td>
               </tr>

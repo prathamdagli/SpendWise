@@ -105,9 +105,7 @@ function Dashboard() {
       {/* ── Header with inline income input ── */}
       <div className="dashboard-header">
         <div>
-          <h2 style={{ marginBottom: "4px" }}>
-            👋 Hello, {user.email?.split("@")[0]}!
-          </h2>
+            Hello, {user.email?.split("@")[0]}!
           <p style={{ color: "var(--text-light)", fontSize: "14px" }}>
             {now.toLocaleString("default", { month: "long", year: "numeric" })} overview
           </p>
@@ -132,7 +130,7 @@ function Dashboard() {
               Save
             </button>
             {incomeSaved && (
-              <span style={{ color: "var(--success)", fontSize: "13px", fontWeight: 600 }}>✅ Saved!</span>
+              <span style={{ color: "var(--success)", fontSize: "13px", fontWeight: 600 }}>Saved!</span>
             )}
           </div>
           {incomeError && (
@@ -164,7 +162,7 @@ function Dashboard() {
       {/* ── Upcoming Recurring Reminders ── */}
       {reminders.length > 0 && (
         <div className="card mb-4">
-          <div className="section-title">🔔 Upcoming Expenses</div>
+          <div className="section-title">Upcoming Expenses</div>
           <div className="reminder-list">
             {reminders.map((exp) => (
               <div className="reminder-item" key={exp.id}>
@@ -187,7 +185,7 @@ function Dashboard() {
           className={showAddForm ? "secondary" : "outline"}
           onClick={() => setShowAddForm(!showAddForm)}
         >
-          {showAddForm ? "✕ Cancel" : "+ Add Expense"}
+          {showAddForm ? "Cancel" : "+ Add Expense"}
         </button>
       </div>
 

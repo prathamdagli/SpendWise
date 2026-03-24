@@ -91,7 +91,7 @@ function Analytics() {
 
   return (
     <div className="container">
-      <h2 style={{ marginBottom: "4px" }}>📊 Analytics</h2>
+      <h2 style={{ marginBottom: "4px" }}>Analytics</h2>
       <p style={{ color: "var(--text-light)", marginBottom: "28px", fontSize: "14px" }}>
         Your spending breakdown and trends
       </p>
@@ -136,7 +136,7 @@ function Analytics() {
 
       {expenses.length === 0 ? (
         <div className="card empty-state">
-          <p>📭 No expense data yet.</p>
+          <p>No expense data yet.</p>
           <p style={{ fontSize: "13px", marginTop: "8px" }}>Add expenses from the dashboard to see charts here!</p>
         </div>
       ) : (
