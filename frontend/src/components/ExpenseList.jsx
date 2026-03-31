@@ -1,6 +1,6 @@
 // src/components/ExpenseList.jsx
 // Displays all expenses in a styled table.
-// Shows category badges and a recurring tag for recurring expenses.
+// Shows category badges, recurring tags, and future expense tags.
 // Each row has Edit and Delete buttons; Edit shows an inline form.
 
 import { useState } from "react";
@@ -58,12 +58,24 @@ function ExpenseList({ expenses, onExpenseChanged }) {
                   {expense.isRecurring && (
                     <span className="recurring-tag">{expense.recurrenceType}</span>
                   )}
+                  {expense.isFutureExpense && (
+                    <span className="future-tag">Planned</span>
+                  )}
                 </td>
                 <td>
                   <span className={`badge ${expense.category}`}>{expense.category}</span>
                 </td>
                 <td style={{ fontWeight: "600" }}>₹{Number(expense.amount).toLocaleString()}</td>
-                <td style={{ color: "var(--text-light)" }}>{expense.date}</td>
+                <td style={{ color: "var(--text-light)" }}>
+                  {expense.isFutureExpense && expense.targetDate ? (
+                    <span>
+                      <span className="target-date-label">Target: </span>
+                      {expense.targetDate}
+                    </span>
+                  ) : (
+                    expense.date
+                  )}
+                </td>
                 <td>
                   <button
                     className="secondary"

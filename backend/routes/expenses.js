@@ -1,6 +1,6 @@
 // routes/expenses.js
 // Handles all expense CRUD routes.
-// Now also supports recurring expense fields.
+// Supports recurring + future expense fields.
 
 const express = require("express");
 const router = express.Router();
@@ -12,7 +12,13 @@ router.post("/", async (req, res) => {
     const {
       userId, title, category, amount, date,
       isRecurring, recurrenceType, recurrenceDate,
+      isFutureExpense, targetDate,
     } = req.body;
+
+    const futureFlag = Boolean(isFutureExpense);
+    const recurringFlag = Boolean(isRecurring);
+
+    console.log("[POST /expenses] isFutureExpense:", futureFlag, "targetDate:", targetDate);
 
     const docRef = await db.collection("expenses").add({
       userId,
@@ -20,10 +26,11 @@ router.post("/", async (req, res) => {
       category,
       amount: parseFloat(amount),
       date,
-      // Recurring fields (default to false if not provided)
-      isRecurring: isRecurring || false,
-      recurrenceType: isRecurring ? recurrenceType : null,
-      recurrenceDate: isRecurring ? parseInt(recurrenceDate) : null,
+      isRecurring: recurringFlag,
+      recurrenceType: recurringFlag ? recurrenceType : null,
+      recurrenceDate: recurringFlag ? parseInt(recurrenceDate) : null,
+      isFutureExpense: futureFlag,
+      targetDate: futureFlag ? (targetDate || null) : null,
       createdAt: new Date().toISOString(),
     });
 
@@ -63,16 +70,24 @@ router.put("/:id", async (req, res) => {
     const {
       title, category, amount, date,
       isRecurring, recurrenceType, recurrenceDate,
+      isFutureExpense, targetDate,
     } = req.body;
+
+    const futureFlag = Boolean(isFutureExpense);
+    const recurringFlag = Boolean(isRecurring);
+
+    console.log("[PUT /expenses/:id] isFutureExpense:", futureFlag, "targetDate:", targetDate);
 
     await db.collection("expenses").doc(id).update({
       title,
       category,
       amount: parseFloat(amount),
       date,
-      isRecurring: isRecurring || false,
-      recurrenceType: isRecurring ? recurrenceType : null,
-      recurrenceDate: isRecurring ? parseInt(recurrenceDate) : null,
+      isRecurring: recurringFlag,
+      recurrenceType: recurringFlag ? recurrenceType : null,
+      recurrenceDate: recurringFlag ? parseInt(recurrenceDate) : null,
+      isFutureExpense: futureFlag,
+      targetDate: futureFlag ? (targetDate || null) : null,
     });
 
     res.status(200).json({ message: "Expense updated" });

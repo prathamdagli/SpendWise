@@ -1,6 +1,7 @@
 // src/components/EditExpense.jsx
 // Inline edit form for updating an existing expense.
-// Mirrors the recurring fields from AddExpense.
+// Mirrors the recurring and future expense fields from AddExpense.
+// Date capped at 2050.
 
 import { useState } from "react";
 import axios from "axios";
@@ -8,6 +9,7 @@ import axios from "axios";
 const BACKEND_URL = "http://localhost:5000";
 const CATEGORIES = ["Food", "Transport", "Shopping", "Bills", "Entertainment", "Other"];
 const RECURRENCE_TYPES = ["Monthly", "Quarterly", "Half-Yearly", "Yearly"];
+const MAX_DATE = "2050-12-31";
 
 function EditExpense({ expense, onDone }) {
   const [title, setTitle] = useState(expense.title);
@@ -17,6 +19,18 @@ function EditExpense({ expense, onDone }) {
   const [isRecurring, setIsRecurring] = useState(expense.isRecurring || false);
   const [recurrenceType, setRecurrenceType] = useState(expense.recurrenceType || "Monthly");
   const [recurrenceDate, setRecurrenceDate] = useState(expense.recurrenceDate || "");
+  const [isFutureExpense, setIsFutureExpense] = useState(expense.isFutureExpense || false);
+  const [targetDate, setTargetDate] = useState(expense.targetDate || "");
+
+  const handleRecurringToggle = (checked) => {
+    setIsRecurring(checked);
+    if (checked) setIsFutureExpense(false);
+  };
+
+  const handleFutureToggle = (checked) => {
+    setIsFutureExpense(checked);
+    if (checked) setIsRecurring(false);
+  };
 
   const handleUpdate = async (e) => {
     e.preventDefault();
@@ -26,6 +40,8 @@ function EditExpense({ expense, onDone }) {
         isRecurring,
         recurrenceType: isRecurring ? recurrenceType : null,
         recurrenceDate: isRecurring ? recurrenceDate : null,
+        isFutureExpense,
+        targetDate: isFutureExpense ? targetDate : null,
       });
       onDone();
     } catch (err) {
@@ -51,23 +67,34 @@ function EditExpense({ expense, onDone }) {
       <div className="form-row">
         <div className="form-group">
           <label>Amount (₹)</label>
-          <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} required />
+          <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} required min="1" />
         </div>
         <div className="form-group">
           <label>Date</label>
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
+          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} max={MAX_DATE} required />
         </div>
       </div>
 
-      {/* Recurring Expense Checkbox */}
-      <div className="checkbox-row">
-        <input
-          type="checkbox"
-          id="edit-recurring-check"
-          checked={isRecurring}
-          onChange={(e) => setIsRecurring(e.target.checked)}
-        />
-        <label htmlFor="edit-recurring-check">Recurring Expense</label>
+      {/* Expense Type Checkboxes */}
+      <div className="checkbox-row-group">
+        <div className="checkbox-row">
+          <input
+            type="checkbox"
+            id="edit-recurring-check"
+            checked={isRecurring}
+            onChange={(e) => handleRecurringToggle(e.target.checked)}
+          />
+          <label htmlFor="edit-recurring-check">Recurring Expense</label>
+        </div>
+        <div className="checkbox-row">
+          <input
+            type="checkbox"
+            id="edit-future-check"
+            checked={isFutureExpense}
+            onChange={(e) => handleFutureToggle(e.target.checked)}
+          />
+          <label htmlFor="edit-future-check">Future / Planned Expense</label>
+        </div>
       </div>
 
       {isRecurring && (
@@ -88,6 +115,22 @@ function EditExpense({ expense, onDone }) {
               required
             />
           </div>
+        </div>
+      )}
+
+      {isFutureExpense && (
+        <div className="form-row">
+          <div className="form-group">
+            <label>Target Date</label>
+            <input
+              type="date"
+              value={targetDate}
+              onChange={(e) => setTargetDate(e.target.value)}
+              max={MAX_DATE}
+              required
+            />
+          </div>
+          <div className="form-group" />
         </div>
       )}
 
