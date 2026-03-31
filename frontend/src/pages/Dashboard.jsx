@@ -89,13 +89,29 @@ function Dashboard() {
   const totalExpense = monthlyExpenses.reduce((sum, e) => sum + Number(e.amount), 0);
   const savings = monthlyIncome - totalExpense;
 
-  // Reminders: recurring expenses due in ≤ 3 days
+  // Reminders: recurring expenses due in ≤ 5 days (handles month-end wrapping)
   const todayDate = now.getDate();
+  const daysInCurrentMonth = new Date(thisYear, thisMonth + 1, 0).getDate();
+
   const reminders = expenses.filter((exp) => {
     if (!exp.isRecurring || !exp.recurrenceDate) return false;
-    const diff = exp.recurrenceDate - todayDate;
-    return diff >= 0 && diff <= 3;
+    const recDay = Number(exp.recurrenceDate);
+    let diff = recDay - todayDate;
+    // Handle month-end wrapping (e.g. today = 29th, recDay = 2nd of next month)
+    if (diff < 0) {
+      diff = (daysInCurrentMonth - todayDate) + recDay;
+    }
+    return diff >= 0 && diff <= 5;
   });
+
+  // Calculate how many days until a recurring expense is due
+  const getDaysUntil = (recDay) => {
+    let diff = Number(recDay) - todayDate;
+    if (diff < 0) {
+      diff = (daysInCurrentMonth - todayDate) + Number(recDay);
+    }
+    return diff;
+  };
 
   if (!user) return <div className="container">Loading...</div>;
 
@@ -159,25 +175,35 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* ── Upcoming Recurring Reminders ── */}
-      {reminders.length > 0 && (
-        <div className="card mb-4">
-          <div className="section-title">Upcoming Expenses</div>
+      {/* ── Upcoming Recurring Reminders (always visible) ── */}
+      <div className="card upcoming-card mb-4">
+        <div className="section-title">Upcoming Recurring Expenses</div>
+        {reminders.length > 0 ? (
           <div className="reminder-list">
-            {reminders.map((exp) => (
-              <div className="reminder-item" key={exp.id}>
-                <span>
-                  <strong>{exp.title}</strong> — ₹{Number(exp.amount).toLocaleString()}
-                  {" "}due on <strong>{exp.recurrenceDate}{getDaySuffix(exp.recurrenceDate)}</strong>
-                  <span style={{ color: "#b45309", marginLeft: "8px", fontSize: "12px" }}>
-                    ({exp.recurrenceType})
-                  </span>
-                </span>
-              </div>
-            ))}
+            {reminders.map((exp) => {
+              const daysLeft = getDaysUntil(exp.recurrenceDate);
+              return (
+                <div className={`reminder-item ${daysLeft <= 1 ? "reminder-urgent" : daysLeft <= 3 ? "reminder-soon" : ""}`} key={exp.id}>
+                  <div className="reminder-content">
+                    <div className="reminder-main">
+                      <strong>{exp.title}</strong> — ₹{Number(exp.amount).toLocaleString()}
+                      {" "}due on <strong>{exp.recurrenceDate}{getDaySuffix(exp.recurrenceDate)}</strong>
+                      <span className="reminder-type">
+                        ({exp.recurrenceType})
+                      </span>
+                    </div>
+                    <span className={`reminder-badge ${daysLeft === 0 ? "today" : daysLeft <= 2 ? "urgent" : "normal"}`}>
+                      {daysLeft === 0 ? "Today" : daysLeft === 1 ? "Tomorrow" : `${daysLeft} days left`}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        </div>
-      )}
+        ) : (
+          <p className="no-reminders">No recurring expenses due in the next 5 days.</p>
+        )}
+      </div>
 
       {/* ── Add Expense Toggle ── */}
       <div style={{ marginBottom: "20px" }}>
