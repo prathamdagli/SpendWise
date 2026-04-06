@@ -1,7 +1,7 @@
 // src/components/EditExpense.jsx
 // Inline edit form for updating an existing expense.
 // Mirrors the recurring and future expense fields from AddExpense.
-// Date capped at 2050.
+// Date capped between 2000 and 2050.
 
 import { useState } from "react";
 import axios from "axios";
@@ -9,6 +9,7 @@ import axios from "axios";
 const BACKEND_URL = "http://localhost:5000";
 const CATEGORIES = ["Food", "Transport", "Shopping", "Bills", "Entertainment", "Other"];
 const RECURRENCE_TYPES = ["Monthly", "Quarterly", "Half-Yearly", "Yearly"];
+const MIN_DATE = "2000-01-01";
 const MAX_DATE = "2050-12-31";
 
 function EditExpense({ expense, onDone }) {
@@ -34,6 +35,14 @@ function EditExpense({ expense, onDone }) {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
+    if (date && (date < MIN_DATE || date > MAX_DATE)) {
+      alert("Date must be between 2000 and 2050.");
+      return;
+    }
+    if (isFutureExpense && targetDate && (targetDate < MIN_DATE || targetDate > MAX_DATE)) {
+      alert("Target date must be between 2000 and 2050.");
+      return;
+    }
     try {
       await axios.put(`${BACKEND_URL}/expenses/${expense.id}`, {
         title, category, amount, date,
@@ -71,7 +80,14 @@ function EditExpense({ expense, onDone }) {
         </div>
         <div className="form-group">
           <label>Date</label>
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} max={MAX_DATE} required />
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            min={MIN_DATE}
+            max={MAX_DATE}
+            required
+          />
         </div>
       </div>
 
@@ -126,6 +142,7 @@ function EditExpense({ expense, onDone }) {
               type="date"
               value={targetDate}
               onChange={(e) => setTargetDate(e.target.value)}
+              min={MIN_DATE}
               max={MAX_DATE}
               required
             />

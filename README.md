@@ -5,17 +5,20 @@ SpendWise is a minimalist, elegant, and beginner-friendly web application design
 ## ✨ Features
 
 -   **User Authentication**: Secure registration and login powered by Firebase Auth.
--   **Smart Home Page**: Logged-in users see quick actions, while visitors see a clean landing page.
--   **Expense Tracking**: Add, View, Edit, and Delete expenses with ease.
--   **Analytics Dashboard**: Visualise spending habits with a category-wise Bar Chart (Food, Transport, Bills, etc.).
--   **Modern UI**: A clean Indigo-themed interface using simple HTML and CSS.
--   **Separated Architecture**: Logic clearly split between a React frontend and a Node.js/Express backend.
+-   **Smart Landing Page**: Logged-in users see quick actions, while visitors see a clean marketing landing page.
+-   **Expense Tracking**: Add, view, edit, and delete expenses with categories and amounts.
+-   **Recurring Expenses**: Monthly/quarterly/half-yearly/yearly recurring entries with upcoming reminders.
+-   **Future/Planned Expenses**: Set target dates and see monthly savings goals.
+-   **Monthly Income + Savings**: Track income, spending, and net savings on the dashboard.
+-   **Interactive Calendar**: Visual calendar with daily expense markers (regular, recurring, planned).
+-   **Powerful Analytics**: Category breakdowns, monthly trends, income vs expense, and spending health charts.
+-   **Separated Architecture**: React frontend and Node.js/Express backend with Firestore.
 
 ## 🛠 Tech Stack
 
 -   **Frontend**: React (Vite), React Router, Axios, Recharts.
--   **Backend**: Node.js, Express.
--   **Database**: Firebase Firestore (NoSQL).
+-   **Backend**: Node.js, Express, CORS.
+-   **Database**: Firebase Firestore (NoSQL) via Firebase Admin SDK.
 -   **Authentication**: Firebase Authentication.
 
 ## 📁 Project Structure
@@ -24,60 +27,78 @@ SpendWise is a minimalist, elegant, and beginner-friendly web application design
 SpendWise/
 ├── frontend/               # React + Vite app
 │   ├── src/
-│   │   ├── pages/          # Home, Login, Register, Dashboard, AddExpense
-│   │   ├── components/     # Navbar, ExpenseList, forms
+│   │   ├── pages/          # Home, Login, Register, Dashboard, Analytics, AddExpensePage
+│   │   ├── components/     # Navbar, AddExpense, EditExpense, ExpenseList
 │   │   ├── firebase.js     # Client SDK setup
-│   │   └── index.css       # Custom styling
+│   │   ├── App.jsx         # Routes
+│   │   └── index.css       # Styling
+│   └── dist/               # Production build output
 │
 └── backend/                # Node.js + Express
-    ├── routes/             # CRUD API routes
+    ├── routes/             # Expenses + Users (income) APIs
     ├── firebaseAdmin.js    # Firebase Admin SDK setup
     ├── server.js           # Server entry point
     └── .env                # Config variables
 ```
 
+## API Endpoints (Backend)
+
+-   `GET /expenses?userId=...` - list expenses for a user
+-   `POST /expenses` - add expense (supports recurring + planned fields)
+-   `PUT /expenses/:id` - update expense
+-   `DELETE /expenses/:id` - delete expense
+-   `GET /users/:userId/income` - get monthly income
+-   `POST /users/:userId/income` - save monthly income
+
 ## 🚀 Getting Started
 
 ### Prerequisites
 
--   [Node.js](https://nodejs.org/) installed on your machine.
--   A [Firebase Project](https://console.firebase.google.com/) created.
+-   Node.js installed on your machine.
+-   A Firebase project created (Firestore + Authentication enabled).
 
 ### Installation
 
-1.  Clone the repository:
-    ```bash
-    git clone https://github.com/your-username/SpendWise.git
-    cd SpendWise
-    ```
-
-2.  **Setup Backend**:
-    -   Go to `backend/` and install dependencies:
+1.  **Backend setup**
+    -   Install dependencies:
         ```bash
         cd backend
         npm install
         ```
-    -   Download your `serviceAccountKey.json` from Firebase and place it in the `backend/` folder.
+    -   Download your `serviceAccountKey.json` from Firebase and place it in `backend/`.
+    -   Optional: edit `backend/.env` to change `PORT` (defaults to `5000`).
 
-3.  **Setup Frontend**:
-    -   Go to `frontend/` and install dependencies:
+2.  **Frontend setup**
+    -   Install dependencies:
         ```bash
         cd ../frontend
         npm install
         ```
-    -   Update `src/firebase.js` with your Firebase Web Config keys.
+    -   Update `frontend/src/firebase.js` with your Firebase Web Config keys.
 
-4.  **Run the Project**:
-    -   You can use the provided `start.bat` file in the root folder (Windows only) or start them manually:
-    -   **Backend**: `node server.js`
-    -   **Frontend**: `npm run dev`
+3.  **Run the project**
+    -   Windows: run `start.bat` from the project root.
+    -   Or start manually:
+        ```bash
+        # Backend
+        cd backend
+        npm start
+
+        # Frontend (new terminal)
+        cd ../frontend
+        npm run dev
+        ```
+
+## Notes
+
+-   Recurring reminders are in-app indicators for expenses due in the next 5 days.
+-   Planned expenses show monthly savings goals based on the target date.
 
 ## 📊 Future Improvements
 
--   [ ] Monthly budget limits and alerts.
--   [ ] Export expense history to PDF/Excel.
--   [ ] Monthly savings goal tracker.
--   [ ] Multi-currency support.
+-   Monthly budget limits and alerts.
+-   Export expense history to PDF/Excel.
+-   Multi-currency support.
 
 ## 📜 License
 

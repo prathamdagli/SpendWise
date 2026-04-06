@@ -1,7 +1,7 @@
 // src/components/AddExpense.jsx
 // Form to add a new expense.
 // Supports recurring expense fields and future expense fields.
-// Date capped at 2050.
+// Date capped between 2000 and 2050.
 
 import { useState } from "react";
 import axios from "axios";
@@ -9,6 +9,7 @@ import axios from "axios";
 const BACKEND_URL = "http://localhost:5000";
 const CATEGORIES = ["Food", "Transport", "Shopping", "Bills", "Entertainment", "Other"];
 const RECURRENCE_TYPES = ["Monthly", "Quarterly", "Half-Yearly", "Yearly"];
+const MIN_DATE = "2000-01-01";
 const MAX_DATE = "2050-12-31";
 
 function AddExpense({ userId, onExpenseAdded }) {
@@ -39,11 +40,12 @@ function AddExpense({ userId, onExpenseAdded }) {
     }
   };
 
-  // Minimum target date = tomorrow
+  // Minimum target date = tomorrow (but never before MIN_DATE)
   const getMinTargetDate = () => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow.toISOString().split("T")[0];
+    const tomorrowStr = tomorrow.toISOString().split("T")[0];
+    return tomorrowStr < MIN_DATE ? MIN_DATE : tomorrowStr;
   };
 
   const handleSubmit = async (e) => {
@@ -51,10 +53,22 @@ function AddExpense({ userId, onExpenseAdded }) {
     setLoading(true);
     setError("");
 
+    // Validate date range (2000-2050)
+    if (date && (date < MIN_DATE || date > MAX_DATE)) {
+      setError("Date must be between 2000 and 2050.");
+      setLoading(false);
+      return;
+    }
+
     // Validate target date for future expenses
     if (isFutureExpense) {
       if (!targetDate) {
         setError("Please select a target date for your planned expense.");
+        setLoading(false);
+        return;
+      }
+      if (targetDate < MIN_DATE || targetDate > MAX_DATE) {
+        setError("Target date must be between 2000 and 2050.");
         setLoading(false);
         return;
       }
@@ -129,6 +143,7 @@ function AddExpense({ userId, onExpenseAdded }) {
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
+              min={MIN_DATE}
               max={MAX_DATE}
               required
               readOnly={isFutureExpense}
