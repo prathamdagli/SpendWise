@@ -6,6 +6,7 @@ import { useState } from "react";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate, Link } from "react-router-dom";
+import axios from "../axiosConfig";
 
 function Register() {
   const [name, setName] = useState("");
@@ -21,6 +22,18 @@ function Register() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(userCredential.user, { displayName: name });
+      
+      // Attempt to sync the user to the backend
+      try {
+        await axios.post("/users/register", {
+          uid: userCredential.user.uid,
+          email: userCredential.user.email,
+          name: name
+        });
+      } catch (backendErr) {
+        console.error("Failed to sync user with backend:", backendErr);
+      }
+
       navigate("/dashboard");
     } catch (err) {
       if (err.code === "auth/email-already-in-use") {

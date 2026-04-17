@@ -4,10 +4,8 @@
 // Each row has Edit and Delete buttons; Edit shows an inline form.
 
 import { useState } from "react";
-import axios from "axios";
+import axios from "../axiosConfig";
 import EditExpense from "./EditExpense";
-
-const BACKEND_URL = "http://localhost:5000";
 
 function ExpenseList({ expenses, onExpenseChanged }) {
   const [editingId, setEditingId] = useState(null);
@@ -16,7 +14,7 @@ function ExpenseList({ expenses, onExpenseChanged }) {
     const confirmed = window.confirm("Are you sure you want to delete this expense?");
     if (!confirmed) return;
     try {
-      await axios.delete(`${BACKEND_URL}/expenses/${id}`);
+      await axios.delete(`/expenses/${id}`);
       onExpenseChanged();
     } catch (error) {
       alert("Failed to delete expense.");

@@ -5,10 +5,18 @@
 const express = require("express");
 const router = express.Router();
 const { db } = require("../firebaseAdmin");
+const { verifyToken, requireApproved } = require("../middleware/authMiddleware");
+
+// Apply authentication and approval check to all expense routes
+router.use(verifyToken);
+router.use(requireApproved);
 
 // POST /expenses — Add a new expense
 router.post("/", async (req, res) => {
   try {
+    if (req.user.role !== "admin" && req.user.uid !== req.body.userId) {
+      return res.status(403).json({ error: "Forbidden: Cannot add expense for another user" });
+    }
     const {
       userId, title, category, amount, date,
       isRecurring, recurrenceType, recurrenceDate,
@@ -45,6 +53,9 @@ router.post("/", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const { userId } = req.query;
+    if (req.user.role !== "admin" && req.user.uid !== userId) {
+      return res.status(403).json({ error: "Forbidden: Cannot read expenses for another user" });
+    }
 
     const snapshot = await db
       .collection("expenses")
@@ -67,6 +78,15 @@ router.get("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
+    
+    // Check ownership
+    const docRef = db.collection("expenses").doc(id);
+    const doc = await docRef.get();
+    if (!doc.exists) return res.status(404).json({ error: "Expense not found" });
+    if (req.user.role !== "admin" && doc.data().userId !== req.user.uid) {
+      return res.status(403).json({ error: "Forbidden: Cannot update this expense" });
+    }
+
     const {
       title, category, amount, date,
       isRecurring, recurrenceType, recurrenceDate,
@@ -101,7 +121,14 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    await db.collection("expenses").doc(id).delete();
+    const docRef = db.collection("expenses").doc(id);
+    const doc = await docRef.get();
+    if (!doc.exists) return res.status(404).json({ error: "Expense not found" });
+    if (req.user.role !== "admin" && doc.data().userId !== req.user.uid) {
+      return res.status(403).json({ error: "Forbidden: Cannot delete this expense" });
+    }
+
+    await docRef.delete();
     res.status(200).json({ message: "Expense deleted" });
   } catch (error) {
     console.error("Error deleting expense:", error);

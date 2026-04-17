@@ -16,4 +16,4 @@ admin.initializeApp({
 // Export Firestore database instance so routes can use it
 const db = admin.firestore();
 
-module.exports = { db };
+module.exports = { db, admin };

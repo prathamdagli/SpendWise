@@ -7,11 +7,9 @@ import { useState, useEffect } from "react";
 import { auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../axiosConfig";
 import AddExpense from "../components/AddExpense";
 import ExpenseList from "../components/ExpenseList";
-
-const BACKEND_URL = "http://localhost:5000";
 
 function Dashboard() {
   const [user, setUser] = useState(null);
@@ -27,11 +25,33 @@ function Dashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        fetchExpenses(currentUser.uid);
-        fetchIncome(currentUser.uid);
+        // We need to fetch the user's role to see if they are admin or pending
+        try {
+          // fetchExpenses and fetchIncome implicitly check if authorized. 
+          // But let's build a specific check:
+          const meRes = await axios.get(`/users/${currentUser.uid}/status`);
+          const status = meRes.data;
+          
+          if (status.role === "admin") {
+            navigate("/admin-dashboard");
+            return;
+          }
+          if (!status.isApproved) {
+            navigate("/pending-approval");
+            return;
+          }
+
+          fetchExpenses(currentUser.uid);
+          fetchIncome(currentUser.uid);
+        } catch (err) {
+          console.error("Auth check failed", err);
+          if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+            navigate("/pending-approval");
+          }
+        }
       } else {
         navigate("/login");
       }
@@ -41,7 +61,7 @@ function Dashboard() {
 
   const fetchExpenses = async (uid) => {
     try {
-      const res = await axios.get(`${BACKEND_URL}/expenses?userId=${uid}`);
+      const res = await axios.get(`/expenses?userId=${uid}`);
       setExpenses(res.data);
     } catch (err) {
       console.error("Error fetching expenses:", err);
@@ -50,7 +70,7 @@ function Dashboard() {
 
   const fetchIncome = async (uid) => {
     try {
-      const res = await axios.get(`${BACKEND_URL}/users/${uid}/income`);
+      const res = await axios.get(`/users/${uid}/income`);
       const val = res.data.monthlyIncome || 0;
       setMonthlyIncome(val);
       if (val > 0) setIncomeInput(String(val));
@@ -67,7 +87,7 @@ function Dashboard() {
     }
     setIncomeError("");
     try {
-      await axios.post(`${BACKEND_URL}/users/${user.uid}/income`, {
+      await axios.post(`/users/${user.uid}/income`, {
         monthlyIncome: parsed,
       });
       setMonthlyIncome(parsed);

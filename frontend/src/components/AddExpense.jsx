@@ -4,9 +4,8 @@
 // Date capped between 2000 and 2050.
 
 import { useState } from "react";
-import axios from "axios";
+import axios from "../axiosConfig";
 
-const BACKEND_URL = "http://localhost:5000";
 const CATEGORIES = ["Food", "Transport", "Shopping", "Bills", "Entertainment", "Other"];
 const RECURRENCE_TYPES = ["Monthly", "Quarterly", "Half-Yearly", "Yearly"];
 const MIN_DATE = "2000-01-01";
@@ -82,7 +81,7 @@ function AddExpense({ userId, onExpenseAdded }) {
     }
 
     try {
-      await axios.post(`${BACKEND_URL}/expenses`, {
+      await axios.post(`/expenses`, {
         userId, title, category, amount, date,
         isRecurring,
         recurrenceType: isRecurring ? recurrenceType : null,

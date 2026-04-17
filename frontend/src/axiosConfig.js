@@ -1,0 +1,22 @@
+import axios from "axios";
+import { auth } from "./firebase";
+
+const axiosInstance = axios.create({
+  baseURL: "http://localhost:5000",
+});
+
+// Add a request interceptor to attach the Firebase ID token
+axiosInstance.interceptors.request.use(
+  async (config) => {
+    if (auth.currentUser) {
+      const token = await auth.currentUser.getIdToken();
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+export default axiosInstance;

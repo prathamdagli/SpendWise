@@ -10,7 +10,7 @@ import { useState, useEffect } from "react";
 import { auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../axiosConfig";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
   PieChart, Pie, Legend, CartesianGrid,
@@ -18,7 +18,6 @@ import {
   ComposedChart, Line,
 } from "recharts";
 
-const BACKEND_URL = "http://localhost:5000";
 const COLORS = ["#059669", "#0d9488", "#f59e0b", "#ef4444", "#6366f1", "#8b5cf6", "#ec4899"];
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -58,7 +57,7 @@ function Analytics() {
 
   const fetchExpenses = async (uid) => {
     try {
-      const res = await axios.get(`${BACKEND_URL}/expenses?userId=${uid}`);
+      const res = await axios.get(`/expenses?userId=${uid}`);
       setExpenses(res.data);
     } catch (err) {
       console.error(err);
@@ -67,7 +66,7 @@ function Analytics() {
 
   const fetchIncome = async (uid) => {
     try {
-      const res = await axios.get(`${BACKEND_URL}/users/${uid}/income`);
+      const res = await axios.get(`/users/${uid}/income`);
       setMonthlyIncome(res.data.monthlyIncome || 0);
     } catch (err) {
       console.error(err);
