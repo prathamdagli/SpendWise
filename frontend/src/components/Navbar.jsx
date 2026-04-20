@@ -68,14 +68,7 @@ function Navbar() {
               </>
             )}
             <span className="nav-user">{user.email?.split("@")[0]} {isAdmin && "(Admin)"}</span>
-            <button 
-              onClick={toggleTheme} 
-              className="secondary" 
-              style={{ padding: "8px 12px", fontSize: "16px", margin: "0 5px" }}
-              title="Toggle Dark Mode"
-            >
-              {theme === "light" ? "🌙" : "☀️"}
-            </button>
+            {/* Theme Toggle moved outside */}
             <button onClick={handleLogout} className="danger" style={{ padding: "8px 18px", fontSize: "13px" }}>
               Logout
             </button>
@@ -86,6 +79,15 @@ function Navbar() {
             <Link to="/register" className={isActive("/register")}>Register</Link>
           </>
         )}
+        {/* Global Theme Toggle */}
+        <button 
+          onClick={toggleTheme} 
+          className="secondary" 
+          style={{ padding: "8px 12px", fontSize: "16px", marginLeft: "10px" }}
+          title="Toggle Dark Mode"
+        >
+          {theme === "light" ? "🌙" : "☀️"}
+        </button>
       </div>
     </nav>
   );
