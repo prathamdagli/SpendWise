@@ -237,7 +237,6 @@ input, select {
 }
 input:focus, select:focus {
   border-color: var(--primary);
-  background: #fff;
   box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
 }
 label {
