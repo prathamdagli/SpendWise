@@ -250,6 +250,33 @@ function Dashboard() {
   const isToday = (day) =>
     day === now.getDate() && calMonth === thisMonth && calYear === thisYear;
 
+  const exportToCSV = () => {
+    if (expenses.length === 0) {
+      alert("No expenses to export.");
+      return;
+    }
+    const headers = ["Date", "Title", "Category", "Amount", "Type"];
+    const rows = expenses.map(e => [
+      e.date || e.createdAt?.split("T")[0],
+      `"${e.title.replace(/"/g, '""')}"`,
+      e.category,
+      e.amount,
+      e.isFutureExpense ? "Future" : e.isRecurring ? "Recurring" : "Regular"
+    ]);
+    
+    let csvContent = "data:text/csv;charset=utf-8," 
+      + headers.join(",") + "\n"
+      + rows.map(r => r.join(",")).join("\n");
+    
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `SpendWise_Expenses_${new Date().toISOString().split("T")[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (!user) return <div className="container">Loading...</div>;
 
   return (
@@ -513,9 +540,13 @@ function Dashboard() {
       )}
 
       {/* ── Expense List with Filter ── */}
-      <div className="expense-list-header">
+      <div className="expense-list-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "12px" }}>
         <div className="section-title" style={{ marginBottom: 0 }}>All Expenses</div>
-        <div className="filter-tabs">
+        <button onClick={exportToCSV} className="outline" style={{ padding: "6px 14px", fontSize: "12px" }}>
+           📥 Download CSV
+        </button>
+      </div>
+      <div className="filter-tabs" style={{ marginBottom: "16px" }}>
           {[
             { key: "daily", label: "Today" },
             { key: "weekly", label: "This Week" },
@@ -534,7 +565,6 @@ function Dashboard() {
             </button>
           ))}
         </div>
-      </div>
       <ExpenseList
         expenses={getFilteredExpenses()}
         onExpenseChanged={() => fetchExpenses(user.uid)}

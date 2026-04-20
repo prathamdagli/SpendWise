@@ -18,6 +18,10 @@ function Register() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    if (name.length > 25) {
+      setError("Name must be 25 characters or less.");
+      return;
+    }
     setError("");
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -52,10 +56,11 @@ function Register() {
       <form onSubmit={handleRegister}>
         <input
           type="text"
-          placeholder="Full Name"
+          placeholder="Full Name (Max 25 characters)"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
+          maxLength="25"
         />
         <input
           type="email"

@@ -10,6 +10,7 @@ import axios from "../axiosConfig";
 function Navbar() {
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -29,6 +30,15 @@ function Navbar() {
     });
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === "light" ? "dark" : "light");
+  };
 
   const handleLogout = async () => {
     await signOut(auth);
@@ -58,6 +68,14 @@ function Navbar() {
               </>
             )}
             <span className="nav-user">{user.email?.split("@")[0]} {isAdmin && "(Admin)"}</span>
+            <button 
+              onClick={toggleTheme} 
+              className="secondary" 
+              style={{ padding: "8px 12px", fontSize: "16px", margin: "0 5px" }}
+              title="Toggle Dark Mode"
+            >
+              {theme === "light" ? "🌙" : "☀️"}
+            </button>
             <button onClick={handleLogout} className="danger" style={{ padding: "8px 18px", fontSize: "13px" }}>
               Logout
             </button>

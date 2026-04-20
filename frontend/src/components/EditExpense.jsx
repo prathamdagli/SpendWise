@@ -5,13 +5,14 @@
 
 import { useState } from "react";
 import axios from "../axiosConfig";
+import { useCategories } from "../hooks/useCategories";
 
-const CATEGORIES = ["Food", "Transport", "Shopping", "Bills", "Entertainment", "Other"];
 const RECURRENCE_TYPES = ["Monthly", "Quarterly", "Half-Yearly", "Yearly"];
 const MIN_DATE = "2000-01-01";
 const MAX_DATE = "2050-12-31";
 
 function EditExpense({ expense, onDone }) {
+  const { categories } = useCategories();
   const [title, setTitle] = useState(expense.title);
   const [category, setCategory] = useState(expense.category);
   const [amount, setAmount] = useState(expense.amount);
@@ -69,7 +70,11 @@ function EditExpense({ expense, onDone }) {
         <div className="form-group">
           <label>Category</label>
           <select value={category} onChange={(e) => setCategory(e.target.value)}>
-            {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+            {categories.length > 0 ? (
+              categories.map(c => <option key={c} value={c}>{c}</option>)
+            ) : (
+              <option value={expense.category}>{expense.category}</option>
+            )}
           </select>
         </div>
       </div>

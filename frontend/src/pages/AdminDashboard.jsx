@@ -9,13 +9,17 @@ function AdminDashboard() {
   const [usersList, setUsersList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [newCategory, setNewCategory] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [catLoading, setCatLoading] = useState(false);
+  const [catError, setCatError] = useState("");
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
-        await featchAdminData();
+        await Promise.all([featchAdminData(), fetchCategories()]);
       } else {
         navigate("/login");
       }
@@ -40,6 +44,49 @@ function AdminDashboard() {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    setCatLoading(true);
+    try {
+      const res = await axios.get("/categories");
+      setCategories(res.data);
+    } catch (err) {
+      console.error("Failed to fetch categories", err);
+    } finally {
+      setCatLoading(false);
+    }
+  };
+
+  const handleAddCategory = async () => {
+    if (!newCategory.trim()) return;
+    setCatLoading(true);
+    setCatError("");
+    try {
+      await axios.post("/categories", { name: newCategory.trim() });
+      setNewCategory("");
+      await fetchCategories();
+    } catch (err) {
+      setCatError(err.response?.data?.error || "Failed to add category.");
+    } finally {
+      setCatLoading(false);
+    }
+  };
+
+  const handleDeleteCategory = async (catName) => {
+    if (!window.confirm(`Are you sure you want to delete the "${catName}" category?`)) return;
+    setCatLoading(true);
+    setCatError("");
+    try {
+      await axios.delete("/categories", { params: { name: catName } });
+      await fetchCategories();
+    } catch (err) {
+      const msg = err.response?.data?.error || err.message || "Failed to delete category.";
+      setCatError(`Error: ${msg}`);
+      console.error("Deletion error details:", err.response || err);
+    } finally {
+      setCatLoading(false);
     }
   };
 
@@ -152,7 +199,7 @@ function AdminDashboard() {
                       </button>
                     </Link>
                   )}
-                  <button onClick={() => handleDelete(u.id)} className="secondary" style={{ padding: "5px 10px", fontSize: "12px", margin: 0 }}>
+                   <button onClick={() => handleDelete(u.id)} className="danger" style={{ padding: "5px 10px", fontSize: "12px", margin: 0 }}>
                     Delete
                   </button>
                 </td>
@@ -166,6 +213,66 @@ function AdminDashboard() {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* --- Category Management Section --- */}
+      <div className="card" style={{ marginTop: "20px" }}>
+        <p className="section-title">Manage Expense Categories</p>
+        <p style={{ fontSize: "13px", color: "var(--text-light)", marginBottom: "16px" }}>
+          Add new categories that will be available to all users in their expense forms.
+        </p>
+        
+        <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+          <input 
+            type="text" 
+            placeholder="New category name..." 
+            value={newCategory}
+            onChange={(e) => setNewCategory(e.target.value)}
+            style={{ flex: 1 }}
+          />
+          <button 
+            onClick={handleAddCategory} 
+            disabled={catLoading || !newCategory.trim()}
+            style={{ padding: "0 20px", margin: 0 }}
+          >
+            {catLoading ? "Adding..." : "Add Category"}
+          </button>
+        </div>
+
+        {catError && <p className="error" style={{ marginBottom: "10px" }}>{catError}</p>}
+
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+          {categories.map((cat, index) => (
+            <div key={index} className="health-tag" style={{ 
+              border: "1px solid var(--border)", 
+              backgroundColor: "var(--bg-light)",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "4px 12px"
+            }}>
+              <span>{cat}</span>
+              <button 
+                onClick={() => handleDeleteCategory(cat)}
+                style={{ 
+                  background: "transparent", 
+                  color: "var(--danger)", 
+                  padding: "0", 
+                  fontSize: "16px",
+                  lineHeight: "1",
+                  border: "none",
+                  boxShadow: "none",
+                  transform: "none",
+                  cursor: "pointer"
+                }}
+                title="Delete Category"
+              >
+                &times;
+              </button>
+            </div>
+          ))}
+          {catLoading && categories.length === 0 && <p style={{ fontSize: "13px", color: "var(--text-light)" }}>Loading categories...</p>}
+        </div>
       </div>
     </div>
   );
