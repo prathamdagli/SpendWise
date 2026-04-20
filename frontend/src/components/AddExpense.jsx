@@ -78,8 +78,6 @@ function AddExpense({ userId, onExpenseAdded }) {
         setLoading(false);
         return;
       }
-    }
-
     try {
       await axios.post(`/expenses`, {
         userId, title, category, amount, date,
@@ -89,13 +87,16 @@ function AddExpense({ userId, onExpenseAdded }) {
         isFutureExpense,
         targetDate: isFutureExpense ? targetDate : null,
       });
-      // Reset form
+      // Reset form on success
       setTitle(""); setCategory("Food"); setAmount(""); setDate("");
       setIsRecurring(false); setRecurrenceType("Monthly"); setRecurrenceDate("");
       setIsFutureExpense(false); setTargetDate("");
+      
+      // Trigger refresh (outside of catch block handling if possible)
       if (onExpenseAdded) onExpenseAdded();
     } catch (err) {
-      setError("Failed to add expense. Please try again.");
+      console.error("Save error:", err);
+      setError("Failed to add expense. Please check your connection and try again.");
     } finally {
       setLoading(false);
     }

@@ -51,9 +51,11 @@ function EditExpense({ expense, onDone }) {
         isFutureExpense,
         targetDate: isFutureExpense ? targetDate : null,
       });
+      // Close the form first if the save was successful
       onDone();
     } catch (err) {
-      alert("Update failed. Please try again.");
+      console.error("Update error:", err);
+      alert("Update failed. Please check your connection and try again.");
     }
   };
 
