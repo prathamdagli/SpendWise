@@ -78,6 +78,7 @@ function AddExpense({ userId, onExpenseAdded }) {
         setLoading(false);
         return;
       }
+    }
     try {
       await axios.post(`/expenses`, {
         userId, title, category, amount, date,
